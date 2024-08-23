@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "helena-haffner-softdesk-p10-16082024"
+version = "0.1.0"
+description = ""
+authors = ["Featherine <helaena.ha2fner@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^5.1"
+django-debug-toolbar = "^4.4.6"
+django-extensions = "^3.2.3"
+pillow = "^10.4.0"
+djangorestframework = "^3.15.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
