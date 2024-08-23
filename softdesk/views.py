@@ -17,8 +17,10 @@ class ContributorsViewset(ReadOnlyModelViewSet):
     def get_queryset(self):
         contributors = None
         project = self.request.GET.get("project")
+        user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
 
-        if project is not None:
+        # todo pas certaine qu'il faille mettre la seconde restriction, toutefois elle sera utile pour sécurer les issues et les commentaires !
+        if project is not None and user_as_contributor is not None:
             contributors = Contributor.objects.filter(project=project)
 
         return contributors
