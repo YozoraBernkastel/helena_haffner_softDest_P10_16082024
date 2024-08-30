@@ -14,19 +14,23 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from os.path import basename
+
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework_nested import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth.views import LoginView
-from softdesk.views import ProjectsViewset, ContributorsViewset, IssueViewset, CommentViewset
+from softdesk.views import ProjectsViewset, ContributorsViewset, IssuesViewset, CommentViewset
 from authentication.views import Home
 
 router = routers.SimpleRouter()
-router.register('projects', ProjectsViewset, basename="project")
-router.register('contributors', ContributorsViewset, basename="contributor")
-router.register("issues", IssueViewset, basename="issue")
-router.register("comments", CommentViewset, basename="comment")
+router.register('projects', ProjectsViewset, basename="projects")
+project_router = routers.NestedSimpleRouter(router, r"projects", lookup="project")
+project_router.register('contributors', ContributorsViewset, basename="contributors")
+project_router.register("issues", IssuesViewset, basename="issues")
+issue_router = routers.NestedSimpleRouter(project_router, r"issues", lookup="issue")
+issue_router.register("comments", CommentViewset, basename="comments")
 
 
 urlpatterns = [
@@ -35,8 +39,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('softdesk/api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('softdesk/api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # path("", LoginView.as_view(template_name='authentication/login.html',
-    #                            redirect_authenticated_user=True), name="login"),
-    path('', Home.as_view()),
-    path("softdesk/api/", include(router.urls)),
+    path(r"softdesk/api/", include(router.urls)),
+    path(r"", include(project_router.urls)),
+    path(r"", include(issue_router.urls)),
 ]
