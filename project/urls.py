@@ -16,9 +16,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.contrib.auth.views import LoginView
+from softdesk.views import ProjectsViewset, ContributorsViewset, IssueViewset, CommentViewset
+from authentication.views import Home
+
+router = routers.SimpleRouter()
+router.register('projects', ProjectsViewset, basename="project")
+router.register('contributors', ContributorsViewset, basename="contributor")
+router.register("issues", IssueViewset, basename="issue")
+router.register("comments", CommentViewset, basename="comment")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("__debug__/", include("debug_toolbar.urls")),
-    path('api-auth/', include('rest_framework.urls'))
+    path('api-auth/', include('rest_framework.urls')),
+    path('softdesk/api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('softdesk/api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path("", LoginView.as_view(template_name='authentication/login.html',
+    #                            redirect_authenticated_user=True), name="login"),
+    path('', Home.as_view()),
+    path("softdesk/api/", include(router.urls)),
 ]
