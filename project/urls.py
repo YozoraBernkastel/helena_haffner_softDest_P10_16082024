@@ -19,12 +19,14 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth.views import LoginView
-from softdesk.views import ProjectsViewset, ContributorsViewset
+from softdesk.views import ProjectsViewset, ContributorsViewset, IssueViewset, CommentViewset
 from authentication.views import Home
 
 router = routers.SimpleRouter()
 router.register('projects', ProjectsViewset, basename="project")
 router.register('contributors', ContributorsViewset, basename="contributor")
+router.register("issues", IssueViewset, basename="issue")
+router.register("comments", CommentViewset, basename="comment")
 
 
 urlpatterns = [

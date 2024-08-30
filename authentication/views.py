@@ -12,8 +12,8 @@ from django.contrib.auth import login
 from django.views.generic import View
 
 
+# todo api view où on ne définit que le post, vérification des mots de passe (identiques ? ) si oui, créer user
 class SignupPage(View):
-    template_name = "authentication/signup.html"
     form = forms.SignupForm
 
     def get(self, request):

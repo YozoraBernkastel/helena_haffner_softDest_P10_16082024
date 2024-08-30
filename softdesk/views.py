@@ -17,12 +17,39 @@ class ContributorsViewset(ReadOnlyModelViewSet):
     def get_queryset(self):
         contributors = None
         project = self.request.GET.get("project")
-        user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
 
-        # todo pas certaine qu'il faille mettre la seconde restriction, toutefois elle sera utile pour sécurer les issues et les commentaires !
-        if project is not None and user_as_contributor is not None:
+        if project is not None:
             contributors = Contributor.objects.filter(project=project)
 
         return contributors
 
 
+class IssueViewset(ReadOnlyModelViewSet):
+    serializer_class = IssueSerializer
+
+    def get_queryset(self):
+        issues = None
+        project = self.request.GET.get("project")
+        user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
+
+        if project is not None and user_as_contributor is not None:
+            issues = Issue.objects.filter(project=project)
+
+        return issues
+
+
+class CommentViewset(ReadOnlyModelViewSet):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+
+        comments = None
+        project = self.request.GET.get("project")
+        user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
+
+        if project is not None and user_as_contributor is not None:
+            issue = self.request.GET.get("issue")
+            print(f"{issue = }")
+            comments = Comment.objects.filter(related_issue=issue)
+
+        return comments
