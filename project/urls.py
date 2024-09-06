@@ -31,7 +31,6 @@ issue_router.register("comment", CommentViewset, basename="project-issue-comment
 project_router.register("contributorCreation", ContributorCreationViewset, basename="contributorCreation")
 project_router.register("issueCreation", IssueCreationVieweset, basename="issuerCreation")
 issue_router.register("commentCreation", CommentCreationViewset, basename="commentCreation")
-project_router.register("deleteProject", DeleteProjectViewset, basename="deleteProject")
 
 
 urlpatterns = [
@@ -44,4 +43,5 @@ urlpatterns = [
     path("softdesk/api/", include(project_router.urls)),
     path("softdesk/api/", include(issue_router.urls)),
     path("softdesk/api/create/project/", ProjectCreationViewset.as_view(), name="project_creation"),
+    path("softdesk/api/delete/project/<slug:pk>/", ProjectsViewset.batch_destroy, name="delete_project"),
 ]

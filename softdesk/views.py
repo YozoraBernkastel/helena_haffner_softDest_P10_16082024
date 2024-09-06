@@ -1,6 +1,8 @@
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.generics import CreateAPIView, DestroyAPIView
 from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework import status
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 
@@ -9,6 +11,11 @@ from softdesk.serializers import ProjectSerializer, ContributorSerializer, Issue
 class ProjectsViewset(ReadOnlyModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+    def batch_destroy(self, *args, **kwargs):
+        project_id = self.kwargs["pk"]
+        self.queryset.filter(project=project_id).delete()
+        return Response(status.HTTP_204_NO_CONTENT)
 
 
 class ContributorViewset(ReadOnlyModelViewSet):
