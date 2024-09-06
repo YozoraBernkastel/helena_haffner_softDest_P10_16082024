@@ -1,22 +1,17 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.generics import CreateAPIView
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.generics import CreateAPIView, DestroyAPIView
 from django.shortcuts import get_object_or_404
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 
 
+# Read Only Views
 class ProjectsViewset(ReadOnlyModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
 
-class ProjectCreationViewset(CreateAPIView):
-    print("création de projet")
-    model = Project
-    serializer_class = ProjectSerializer
-
-
-class ContributorsViewset(ReadOnlyModelViewSet):
+class ContributorViewset(ReadOnlyModelViewSet):
     serializer_class = ContributorSerializer
 
     def get_queryset(self):
@@ -25,7 +20,7 @@ class ContributorsViewset(ReadOnlyModelViewSet):
         return project.contributors.all()
 
 
-class IssuesViewset(ReadOnlyModelViewSet):
+class IssueViewset(ReadOnlyModelViewSet):
     serializer_class = IssueSerializer
 
     def get_queryset(self):
@@ -52,3 +47,35 @@ class CommentViewset(ReadOnlyModelViewSet):
             issue = get_object_or_404(Issue, pk=self.kwargs["issue_pk"])
 
         return issue.comments.all()
+
+
+# Creation views
+class ProjectCreationViewset(CreateAPIView):
+    model = Project
+    serializer_class = ProjectSerializer
+
+
+class ContributorCreationViewset(ModelViewSet):
+    model = Contributor
+    serializer_class = ContributorSerializer
+
+
+class IssueCreationVieweset(ModelViewSet):
+    model = Issue
+    serializer_class = IssueSerializer
+
+
+class CommentCreationViewset(ModelViewSet):
+    model = Comment
+    serializer_class = CommentSerializer
+
+
+# delete views
+class DeleteProjectViewset(DestroyAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    # model = Project
+    #
+    # def get_object(self):
+    #     project = get_object_or_404(Project, pk=self.kwargs["project"])
+    #     return project
