@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.generics import CreateAPIView
 from django.shortcuts import get_object_or_404
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
@@ -6,6 +7,12 @@ from softdesk.serializers import ProjectSerializer, ContributorSerializer, Issue
 
 class ProjectsViewset(ReadOnlyModelViewSet):
     queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+
+class ProjectCreationViewset(CreateAPIView):
+    print("création de projet")
+    model = Project
     serializer_class = ProjectSerializer
 
 

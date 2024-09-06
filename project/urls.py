@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_nested import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from softdesk.views import ProjectsViewset, ContributorsViewset, IssuesViewset, CommentViewset
+from softdesk.views import ProjectsViewset, ProjectCreationViewset, ContributorsViewset, IssuesViewset, CommentViewset
 
 router = routers.SimpleRouter()
 router.register('project', ProjectsViewset, basename="project")
@@ -38,4 +38,5 @@ urlpatterns = [
     path("softdesk/api/", include(router.urls)),
     path("softdesk/api/", include(project_router.urls)),
     path("softdesk/api/", include(issue_router.urls)),
+    path("softdesk/api/create/project/", ProjectCreationViewset.as_view(), name="project_creation"),
 ]

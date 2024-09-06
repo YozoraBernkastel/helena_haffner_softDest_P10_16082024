@@ -1,18 +1,27 @@
 from rest_framework.serializers import ModelSerializer
-from softdesk.models import Project,  Contributor, Issue, Comment
+from softdesk.models import Project, Contributor, Issue, Comment
 
 
 class ContributorSerializer(ModelSerializer):
-
     class Meta:
         model = Contributor
         fields = ["user", "time_created"]
 
 
 class ProjectSerializer(ModelSerializer):
+    def create(self, validated_data):
+        project = Project.objects.create(creator=validated_data["creator"],
+                                         description=validated_data["description"],
+                                         name=validated_data["name"],
+                                         type=validated_data["type"],
+                                         status=validated_data["status"],
+                                         )
+        return project
+
     class Meta:
         model = Project
-        fields = ["creator", "description", "name", "type", "status", "time_created", "modification_time", "contributors"]
+        fields = ["creator", "description", "name", "type", "status", "time_created", "modification_time",
+                  "contributors"]
 
     contributors = ContributorSerializer(many=True, read_only=True)
 
@@ -33,4 +42,3 @@ class IssueSerializer(ModelSerializer):
 
         def to_representation(self):
             pass
-
