@@ -16,17 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework_nested import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from django.contrib.auth.views import LoginView
-from softdesk.views import ProjectsViewset, ContributorsViewset, IssueViewset, CommentViewset
-from authentication.views import Home
+from softdesk.views import ProjectsViewset, ContributorsViewset, IssuesViewset, CommentViewset
 
 router = routers.SimpleRouter()
-router.register('projects', ProjectsViewset, basename="project")
-router.register('contributors', ContributorsViewset, basename="contributor")
-router.register("issues", IssueViewset, basename="issue")
-router.register("comments", CommentViewset, basename="comment")
+router.register('project', ProjectsViewset, basename="project")
+project_router = routers.NestedSimpleRouter(router, "project", lookup="project")
+project_router.register('contributor', ContributorsViewset, basename="project-contributor")
+project_router.register("issue", IssuesViewset, basename="projects-issue")
+issue_router = routers.NestedSimpleRouter(project_router, "issue", lookup="issue")
+issue_router.register("comment", CommentViewset, basename="project-issue-comment")
 
 
 urlpatterns = [
@@ -35,8 +35,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('softdesk/api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('softdesk/api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # path("", LoginView.as_view(template_name='authentication/login.html',
-    #                            redirect_authenticated_user=True), name="login"),
-    path('', Home.as_view()),
     path("softdesk/api/", include(router.urls)),
+    path("softdesk/api/", include(project_router.urls)),
+    path("softdesk/api/", include(issue_router.urls)),
 ]
