@@ -44,6 +44,7 @@ class Issue(models.Model):
     #  Utiliser un chiffre pour le statut devrait permettre de prendre moins de place dans la bdd je suppose.
     status = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(5)], verbose_name="statut")
+    # todo mettre un choice plutôt qu'un min max value
     # todo associer un chiffre à un statut dans le formulaire puis créer une comboBox contenant ces noms de statut!!!!
     #  Utiliser un chiffre pour le statut devrait permettre de prendre moins de place dans la bdd je suppose.
     type = models.PositiveSmallIntegerField(
