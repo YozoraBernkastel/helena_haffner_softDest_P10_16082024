@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.generics import CreateAPIView, DestroyAPIView
+from rest_framework_simplejwt.tokens import AccessToken
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
@@ -78,11 +79,27 @@ class CommentCreationViewset(ModelViewSet):
 
 
 # delete views
-class DeleteProjectViewset(DestroyAPIView):
+class DeleteProjectViewset(ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    # model = Project
-    #
-    # def get_object(self):
+    # authentication_classes = (AccessToken,)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+#
+# class DeleteProjectViewset(DestroyAPIView):
+#     queryset = Project.objects.all()
+#     serializer_class = ProjectSerializer
+
+
+    # # model = Project
+    # #
+    # # def get_object(self):
     #     project = get_object_or_404(Project, pk=self.kwargs["project"])
     #     return project
