@@ -10,7 +10,7 @@ class User(AbstractUser, PermissionsMixin):
     # date_joined = date et heure de création de l'objet
     # last_join (?) = dernière connexion
 
-    REQUIRED_FIELDS = ['password', 'birthday_date']
+    REQUIRED_FIELDS = ['password', "birthday_date", "can_contact", "share_personal_data"]
 
     @property
     def minimal_consent_age(self) -> bool:

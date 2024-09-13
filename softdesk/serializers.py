@@ -4,7 +4,6 @@ from softdesk.models import Project, Contributor, Issue, Comment
 
 class ContributorSerializer(ModelSerializer):
     def create(self, validated_data):
-        # todo possibilité de récupérer l'id de project via l'url ??
         contributor = Contributor.objects.create(user=validated_data["user"],
                                                  project=validated_data["project"]
                                                  )

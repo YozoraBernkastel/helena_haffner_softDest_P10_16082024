@@ -37,7 +37,7 @@ issue_router.register("commentCreation", CommentCreationViewset, basename="comme
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("__debug__/", include("debug_toolbar.urls")),
-    path('api-auth/', include('rest_framework.urls')),
+    path("api/auth/", include(("authentication.urls", "auth"))),
     path('softdesk/api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('softdesk/api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("softdesk/api/", include(router.urls)),

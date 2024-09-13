@@ -17,7 +17,7 @@ class Project(models.Model):
     status = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(5)], verbose_name="statut")
     time_created = models.DateTimeField(auto_now_add=True)
-    modification_time = models.DateTimeField(auto_now_add=True)
+    modification_time = models.DateTimeField(auto_now=True)
 
 
 class Contributor(models.Model):
@@ -28,8 +28,6 @@ class Contributor(models.Model):
     time_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        # ensures we don't get multiple UserFollows instances
-        # for unique user-user_followed pairs
         unique_together = ('user', 'project',)
 
 
@@ -56,7 +54,7 @@ class Issue(models.Model):
     title = models.CharField(max_length=128, verbose_name="titre")
     description = models.TextField(max_length=2048, blank=True, verbose_name="description")
     time_created = models.DateTimeField(auto_now_add=True)
-    modification_time = models.DateTimeField(auto_now_add=True)
+    modification_time = models.DateTimeField(auto_now=True)
 
 
 class Comment(models.Model):
@@ -65,4 +63,4 @@ class Comment(models.Model):
     related_issue = models.ForeignKey(to=Issue, on_delete=models.CASCADE, related_name="comments")
     content = models.TextField(max_length=2048, blank=True, verbose_name="contenu")
     time_created = models.DateTimeField(auto_now_add=True)
-    modification_time = models.DateTimeField(auto_now_add=True)
+    modification_time = models.DateTimeField(auto_now=True)

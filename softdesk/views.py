@@ -1,8 +1,7 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+import datetime
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView
-
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
 from softdesk.permissions import UserPermission, CreatorPermission
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
@@ -10,12 +9,10 @@ from softdesk.serializers import ProjectSerializer, ContributorSerializer, Issue
 
 # todo il faudra penser à paginer certaines requêtes (ça fait parti du projet)
 
-# Read Only Views
 class ProjectsViewset(ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes: list = [CreatorPermission]
-
 
 class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
@@ -27,7 +24,7 @@ class ContributorViewset(ModelViewSet):
         return project.contributors.all()
 
 
-class IssueViewset(ReadOnlyModelViewSet):
+class IssueViewset(ModelViewSet):
     serializer_class = IssueSerializer
     permission_classes: list = [CreatorPermission]
 
@@ -42,7 +39,7 @@ class IssueViewset(ReadOnlyModelViewSet):
         return issues
 
 
-class CommentViewset(ReadOnlyModelViewSet):
+class CommentViewset(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes: list = [CreatorPermission]
 
