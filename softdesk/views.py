@@ -1,16 +1,23 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet
+import datetime
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.generics import CreateAPIView
 from django.shortcuts import get_object_or_404
+from softdesk.permissions import UserPermission, CreatorPermission
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 
 
-class ProjectsViewset(ReadOnlyModelViewSet):
+# todo il faudra penser à paginer certaines requêtes (ça fait parti du projet)
+
+class ProjectsViewset(ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes: list = [CreatorPermission]
 
 
-class ContributorsViewset(ReadOnlyModelViewSet):
+class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
+    permission_classes: list = [UserPermission]
 
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
@@ -18,8 +25,9 @@ class ContributorsViewset(ReadOnlyModelViewSet):
         return project.contributors.all()
 
 
-class IssuesViewset(ReadOnlyModelViewSet):
+class IssueViewset(ModelViewSet):
     serializer_class = IssueSerializer
+    permission_classes: list = [CreatorPermission]
 
     def get_queryset(self):
         issues = None
@@ -32,11 +40,11 @@ class IssuesViewset(ReadOnlyModelViewSet):
         return issues
 
 
-class CommentViewset(ReadOnlyModelViewSet):
+class CommentViewset(ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes: list = [CreatorPermission]
 
     def get_queryset(self):
-
         issue = None
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
         user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
@@ -45,3 +53,25 @@ class CommentViewset(ReadOnlyModelViewSet):
             issue = get_object_or_404(Issue, pk=self.kwargs["issue_pk"])
 
         return issue.comments.all()
+
+
+# Creation views
+class ProjectCreationViewset(CreateAPIView):
+    model = Project
+    serializer_class = ProjectSerializer
+
+
+class ContributorCreationViewset(ModelViewSet):
+    model = Contributor
+    serializer_class = ContributorSerializer
+
+
+class IssueCreationVieweset(ModelViewSet):
+    model = Issue
+    serializer_class = IssueSerializer
+
+
+class CommentCreationViewset(ModelViewSet):
+    model = Comment
+    serializer_class = CommentSerializer
+

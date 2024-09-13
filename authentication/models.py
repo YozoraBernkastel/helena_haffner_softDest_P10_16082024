@@ -7,10 +7,8 @@ class User(AbstractUser, PermissionsMixin):
     birthday_date = models.DateField()
     can_contact = models.BooleanField(default=False)
     share_personal_data = models.BooleanField(default=False)
-    # date_joined = date et heure de création de l'objet
-    # last_join (?) = dernière connexion
 
-    REQUIRED_FIELDS = ['password', 'birthday_date']
+    REQUIRED_FIELDS = ["birthday_date", "can_contact", "share_personal_data"]
 
     @property
     def minimal_consent_age(self) -> bool:
