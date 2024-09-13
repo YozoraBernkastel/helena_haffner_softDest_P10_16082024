@@ -2,7 +2,7 @@ import datetime
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView
 from django.shortcuts import get_object_or_404
-from softdesk.permissions import UserPermission, CreatorPermission
+from softdesk.permissions import UserPermission, CreatorPermission, ProjectPermission, ContributorPermission
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 
@@ -12,12 +12,18 @@ from softdesk.serializers import ProjectSerializer, ContributorSerializer, Issue
 class ProjectsViewset(ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes: list = [CreatorPermission]
+    permission_classes: list = [ProjectPermission]
+
+    def get_queryset(self):
+        contributions = Contributor.objects.filter(user=self.request.user)
+        inside_project: list = [Project.objects.get(pk=c.project.pk) for c in contributions]
+
+        return inside_project
 
 
 class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
-    permission_classes: list = [UserPermission]
+    permission_classes: list = [ContributorPermission]
 
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
