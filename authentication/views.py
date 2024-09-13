@@ -6,3 +6,5 @@ from authentication.serializers import UserSerializer
 class SignupView(CreateAPIView):
     model = User
     serializer_class = UserSerializer
+    permission_classes: list = []
+

@@ -14,6 +14,7 @@ class ProjectsViewset(ModelViewSet):
     serializer_class = ProjectSerializer
     permission_classes: list = [CreatorPermission]
 
+
 class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
     permission_classes: list = [UserPermission]
