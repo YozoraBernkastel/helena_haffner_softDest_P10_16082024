@@ -1,26 +1,25 @@
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.generics import CreateAPIView, DestroyAPIView
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.generics import CreateAPIView
+
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework import status
+from softdesk.permissions import UserPermission, CreatorPermission
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 
 
+# todo il faudra penser à paginer certaines requêtes (ça fait parti du projet)
+
 # Read Only Views
-class ProjectsViewset(ReadOnlyModelViewSet):
+class ProjectsViewset(ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-
-    def batch_destroy(self, *args, **kwargs):
-        project_id = self.kwargs["pk"]
-        self.queryset.filter(project=project_id).delete()
-        return Response(status.HTTP_204_NO_CONTENT)
+    permission_classes: list = [CreatorPermission]
 
 
-class ContributorViewset(ReadOnlyModelViewSet):
+class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
+    permission_classes: list = [UserPermission]
 
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
@@ -30,6 +29,7 @@ class ContributorViewset(ReadOnlyModelViewSet):
 
 class IssueViewset(ReadOnlyModelViewSet):
     serializer_class = IssueSerializer
+    permission_classes: list = [CreatorPermission]
 
     def get_queryset(self):
         issues = None
@@ -44,9 +44,9 @@ class IssueViewset(ReadOnlyModelViewSet):
 
 class CommentViewset(ReadOnlyModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes: list = [CreatorPermission]
 
     def get_queryset(self):
-
         issue = None
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
         user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
@@ -77,29 +77,3 @@ class CommentCreationViewset(ModelViewSet):
     model = Comment
     serializer_class = CommentSerializer
 
-
-# delete views
-class DeleteProjectViewset(ModelViewSet):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    # authentication_classes = (AccessToken,)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def perform_destroy(self, instance):
-        instance.delete()
-
-#
-# class DeleteProjectViewset(DestroyAPIView):
-#     queryset = Project.objects.all()
-#     serializer_class = ProjectSerializer
-
-
-    # # model = Project
-    # #
-    # # def get_object(self):
-    #     project = get_object_or_404(Project, pk=self.kwargs["project"])
-    #     return project
