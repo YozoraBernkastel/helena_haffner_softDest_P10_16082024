@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from softdesk.permissions import CreatorPermission, ProjectPermission, ContributorPermission, ContributorPostPermission
 from softdesk.models import Project, Contributor, Issue, Comment
-from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
+from softdesk.serializers import (ProjectSerializer, ProjectListSerializer, ContributorSerializer,
+                                  ContributorListSerializer, IssueSerializer, IssueListSerializer,
+                                  CommentSerializer, CommentListSerializer)
 from softdesk.custom_pagination import CustomPagination
 
 
@@ -17,6 +19,12 @@ class ProjectsViewset(ModelViewSet):
     permission_classes: list = [ProjectPermission]
     pagination_class = CustomPagination
 
+    def get_serializer_class(self):
+        if "pk" not in self.kwargs:
+            self.serializer_class = ProjectListSerializer
+
+        return super().get_serializer_class()
+
 
 class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
@@ -27,6 +35,12 @@ class ContributorViewset(ModelViewSet):
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
 
         return project.contributors.all()
+
+    def get_serializer_class(self):
+        if "pk" not in self.kwargs:
+            self.serializer_class = ContributorListSerializer
+
+        return super().get_serializer_class()
 
 
 class IssueViewset(ModelViewSet):
@@ -44,6 +58,12 @@ class IssueViewset(ModelViewSet):
 
         return issues
 
+    def get_serializer_class(self):
+        if "pk" not in self.kwargs:
+            self.serializer_class = IssueListSerializer
+
+        return super().get_serializer_class()
+
 
 class CommentViewset(ModelViewSet):
     serializer_class = CommentSerializer
@@ -60,6 +80,12 @@ class CommentViewset(ModelViewSet):
 
         return issue.comments.all()
 
+    def get_serializer_class(self):
+        if "pk" not in self.kwargs:
+            self.serializer_class = CommentListSerializer
+
+        return super().get_serializer_class()
+
 
 # Creation views
 class ProjectCreationViewset(CreateAPIView):
@@ -72,7 +98,7 @@ class ContributorCreationViewset(ModelViewSet):
     serializer_class = ContributorSerializer
 
     def create(self, request, *args, **kwargs):
-        project = Project.objects.filter(pk=self.kwargs["project_id"], creator=self.request.user)
+        project = Project.objects.filter(pk=self.kwargs["project_pk"], creator=self.request.user)
         contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
         if len(project) > 0 or len(contributor) > 0:
             return super().create(request, args, kwargs)
@@ -85,7 +111,10 @@ class IssueCreationVieweset(ModelViewSet):
     serializer_class = IssueSerializer
 
     def create(self, request, *args, **kwargs):
-        project = Project.objects.filter(pk=self.kwargs["project_id"], creator=self.request.user)
+        # todo peut-être un peu dangereux de vérifier en utiliser project_pk plutôt que la donnée dans le formulaire, non ?
+        #  ça peut permettre d'envoyer dans le formulaire un id de projet différent tout en passant la sécurité.
+        #  Il faudrait fusionner les deux données peut-être, ou n'en utiliser qu'une
+        project = Project.objects.filter(pk=self.kwargs["project_pk"], creator=self.request.user)
         contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
 
         if len(project) > 0 or len(contributor) > 0:
@@ -99,12 +128,10 @@ class CommentCreationViewset(ModelViewSet):
     serializer_class = CommentSerializer
 
     def create(self, request, *args, **kwargs):
-        project = Project.objects.filter(pk=self.kwargs["project_id"], creator=self.request.user)
+        project = Project.objects.filter(pk=self.kwargs["project_pk"], creator=self.request.user)
         contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
 
         if len(project) > 0 or len(contributor) > 0:
             return super().create(request, args, kwargs)
 
         return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-
