@@ -19,7 +19,6 @@ class CreatorPermission(BasePermission):
         return obj.creator == request.user
 
 
-# todo cet héritage est-il vraiment utile ? Ne peut-on pas directement vérifer dans cette classe ?
 class ProjectPermission(CreatorPermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
@@ -38,4 +37,12 @@ class ContributorPermission(UserPermission):
             return len(contributor) > 0 and super().has_object_permission(request, view, obj)
 
         return super().has_object_permission(request, view, obj)
+
+
+class ContributorPostPermission(UserPermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method == "POST":
+            contributor = Contributor.objects.filter(user=request.user, project=request.kwargs["project_pk"])
+            return len(contributor) > 0 and super().has_object_permission(request, view, obj)
+
 
