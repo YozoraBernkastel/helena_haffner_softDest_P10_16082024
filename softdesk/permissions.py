@@ -40,6 +40,7 @@ class ContributorPermission(UserPermission):
 
 
 class ContributorPostPermission(UserPermission):
+    # todo à supprimer probablement
     def has_object_permission(self, request, view, obj):
         if request.method == "POST":
             contributor = Contributor.objects.filter(user=request.user, project=request.kwargs["project_pk"])

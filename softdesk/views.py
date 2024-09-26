@@ -1,5 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView
+from rest_framework import status
+from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from softdesk.permissions import CreatorPermission, ProjectPermission, ContributorPermission, ContributorPostPermission
 from softdesk.models import Project, Contributor, Issue, Comment
@@ -67,20 +69,42 @@ class ProjectCreationViewset(CreateAPIView):
 
 class ContributorCreationViewset(ModelViewSet):
     model = Contributor
-    # todo des restrictions ? Peut-être qu'il faut vérifier si l'utilisateur qui crée le contributeur est lui-même contributeur/ créateur du projet ?
     serializer_class = ContributorSerializer
+
+    def create(self, request, *args, **kwargs):
+        project = Project.objects.filter(pk=self.kwargs["project_id"], creator=self.request.user)
+        contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
+        if len(project) > 0 or len(contributor) > 0:
+            return super().create(request, args, kwargs)
+
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class IssueCreationVieweset(ModelViewSet):
     model = Issue
     serializer_class = IssueSerializer
-    # todo ne fonctionne pas !!!
-    permission_classes: list = [ContributorPostPermission]
+
+    def create(self, request, *args, **kwargs):
+        project = Project.objects.filter(pk=self.kwargs["project_id"], creator=self.request.user)
+        contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
+
+        if len(project) > 0 or len(contributor) > 0:
+            return super().create(request, args, kwargs)
+
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class CommentCreationViewset(ModelViewSet):
     model = Comment
     serializer_class = CommentSerializer
-    # todo ne fonctionne pas !!!
-    permission_classes: list = [ContributorPostPermission]
+
+    def create(self, request, *args, **kwargs):
+        project = Project.objects.filter(pk=self.kwargs["project_id"], creator=self.request.user)
+        contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
+
+        if len(project) > 0 or len(contributor) > 0:
+            return super().create(request, args, kwargs)
+
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
