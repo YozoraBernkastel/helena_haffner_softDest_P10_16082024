@@ -40,6 +40,7 @@ urlpatterns = [
     path("api/auth/", include(("authentication.urls", "auth"))),
     path('softdesk/api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('softdesk/api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path("softdesk/api/logout/", LogoutView.as_view(), name="logout"),
     path("softdesk/api/", include(router.urls)),
     path("softdesk/api/", include(project_router.urls)),
     path("softdesk/api/", include(issue_router.urls)),
