@@ -1,6 +1,5 @@
 from rest_framework.permissions import BasePermission
-
-from softdesk.models import Contributor
+from softdesk.models import Contributor, Project
 
 
 class UserPermission(BasePermission):
@@ -39,11 +38,23 @@ class ContributorPermission(UserPermission):
         return super().has_object_permission(request, view, obj)
 
 
-class ContributorPostPermission(UserPermission):
-    # todo à supprimer probablement
-    def has_object_permission(self, request, view, obj):
-        if request.method == "POST":
-            contributor = Contributor.objects.filter(user=request.user, project=request.kwargs["project_pk"])
-            return len(contributor) > 0 and super().has_object_permission(request, view, obj)
+class GateKeeper:
+    @staticmethod
+    def is_creator(user, project_pk) -> bool:
+        creator = Project.objects.filter(pk=project_pk, creator=user)
+        return len(creator) > 0
 
+    @staticmethod
+    def is_contributor(user, project_pk) -> bool:
+        contributor = Contributor.objects.filter(user=user, project=project_pk)
+        return len(contributor) > 0
 
+    def is_part_of_the_project(self, user, project_pk) -> bool:
+        return self.is_creator(user, project_pk) or self.is_contributor(user, project_pk)
+
+    @staticmethod
+    def is_same_project(request, kwargs: dict) -> bool:
+        return request.data["project"] == kwargs["project_pk"]
+
+    def is_authorized_to_create(self, request, kwargs: dict) -> bool:
+        return self.is_same_project(request, kwargs) and self.is_part_of_the_project(request.user, kwargs["project_pk"])

@@ -3,15 +3,13 @@ from rest_framework.generics import CreateAPIView
 from rest_framework import status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from softdesk.permissions import CreatorPermission, ProjectPermission, ContributorPermission, ContributorPostPermission
+from softdesk.permissions import CreatorPermission, ProjectPermission, ContributorPermission , GateKeeper
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import (ProjectSerializer, ProjectListSerializer, ContributorSerializer,
                                   ContributorListSerializer, IssueSerializer, IssueListSerializer,
                                   CommentSerializer, CommentListSerializer)
 from softdesk.custom_pagination import CustomPagination
 
-
-# todo il faudra penser à paginer certaines requêtes (ça fait parti du projet)
 
 class ProjectsViewset(ModelViewSet):
     queryset = Project.objects.all()
@@ -93,45 +91,34 @@ class ProjectCreationViewset(CreateAPIView):
     serializer_class = ProjectSerializer
 
 
-class ContributorCreationViewset(ModelViewSet):
+class ContributorCreationViewset(ModelViewSet, GateKeeper):
     model = Contributor
     serializer_class = ContributorSerializer
 
     def create(self, request, *args, **kwargs):
-        project = Project.objects.filter(pk=self.kwargs["project_pk"], creator=self.request.user)
-        contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
-        if len(project) > 0 or len(contributor) > 0:
+        if self.is_authorized_to_create(request, kwargs):
             return super().create(request, args, kwargs)
 
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class IssueCreationVieweset(ModelViewSet):
+class IssueCreationVieweset(ModelViewSet, GateKeeper):
     model = Issue
     serializer_class = IssueSerializer
 
     def create(self, request, *args, **kwargs):
-        # todo peut-être un peu dangereux de vérifier en utiliser project_pk plutôt que la donnée dans le formulaire, non ?
-        #  ça peut permettre d'envoyer dans le formulaire un id de projet différent tout en passant la sécurité.
-        #  Il faudrait fusionner les deux données peut-être, ou n'en utiliser qu'une
-        project = Project.objects.filter(pk=self.kwargs["project_pk"], creator=self.request.user)
-        contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
-
-        if len(project) > 0 or len(contributor) > 0:
+        if self.is_authorized_to_create(request, kwargs):
             return super().create(request, args, kwargs)
 
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class CommentCreationViewset(ModelViewSet):
+class CommentCreationViewset(ModelViewSet, GateKeeper):
     model = Comment
     serializer_class = CommentSerializer
 
     def create(self, request, *args, **kwargs):
-        project = Project.objects.filter(pk=self.kwargs["project_pk"], creator=self.request.user)
-        contributor = Contributor.objects.filter(user=request.user, project=kwargs["project_pk"])
-
-        if len(project) > 0 or len(contributor) > 0:
+        if self.is_part_of_the_project(request.user, kwargs["project_pk"]):
             return super().create(request, args, kwargs)
 
         return Response(status=status.HTTP_401_UNAUTHORIZED)
