@@ -1,33 +1,50 @@
-import datetime
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView
+from rest_framework import status
+from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from softdesk.permissions import UserPermission, CreatorPermission
+from softdesk.permissions import CreatorPermission, ProjectPermission, ContributorPermission , GateKeeper
 from softdesk.models import Project, Contributor, Issue, Comment
-from softdesk.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
+from softdesk.serializers import (ProjectSerializer, ProjectListSerializer, ContributorSerializer,
+                                  ContributorListSerializer, IssueSerializer, IssueListSerializer,
+                                  CommentSerializer, CommentListSerializer)
+from softdesk.custom_pagination import CustomPagination
 
-
-# todo il faudra penser à paginer certaines requêtes (ça fait parti du projet)
 
 class ProjectsViewset(ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes: list = [CreatorPermission]
+    permission_classes: list = [ProjectPermission]
+    pagination_class = CustomPagination
+
+    def get_serializer_class(self):
+        if "pk" not in self.kwargs:
+            self.serializer_class = ProjectListSerializer
+
+        return super().get_serializer_class()
 
 
 class ContributorViewset(ModelViewSet):
     serializer_class = ContributorSerializer
-    permission_classes: list = [UserPermission]
+    permission_classes: list = [ContributorPermission]
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
 
         return project.contributors.all()
 
+    def get_serializer_class(self):
+        if "pk" not in self.kwargs:
+            self.serializer_class = ContributorListSerializer
+
+        return super().get_serializer_class()
+
 
 class IssueViewset(ModelViewSet):
     serializer_class = IssueSerializer
     permission_classes: list = [CreatorPermission]
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         issues = None
@@ -39,10 +56,17 @@ class IssueViewset(ModelViewSet):
 
         return issues
 
+    def get_serializer_class(self):
+        if "pk" not in self.kwargs:
+            self.serializer_class = IssueListSerializer
+
+        return super().get_serializer_class()
+
 
 class CommentViewset(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes: list = [CreatorPermission]
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         issue = None
@@ -54,6 +78,12 @@ class CommentViewset(ModelViewSet):
 
         return issue.comments.all()
 
+    def get_serializer_class(self):
+        if "pk" not in self.kwargs:
+            self.serializer_class = CommentListSerializer
+
+        return super().get_serializer_class()
+
 
 # Creation views
 class ProjectCreationViewset(CreateAPIView):
@@ -61,17 +91,34 @@ class ProjectCreationViewset(CreateAPIView):
     serializer_class = ProjectSerializer
 
 
-class ContributorCreationViewset(ModelViewSet):
+class ContributorCreationViewset(ModelViewSet, GateKeeper):
     model = Contributor
     serializer_class = ContributorSerializer
 
+    def create(self, request, *args, **kwargs):
+        if self.is_authorized_to_create(request, kwargs):
+            return super().create(request, args, kwargs)
 
-class IssueCreationVieweset(ModelViewSet):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class IssueCreationVieweset(ModelViewSet, GateKeeper):
     model = Issue
     serializer_class = IssueSerializer
 
+    def create(self, request, *args, **kwargs):
+        if self.is_authorized_to_create(request, kwargs):
+            return super().create(request, args, kwargs)
 
-class CommentCreationViewset(ModelViewSet):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class CommentCreationViewset(ModelViewSet, GateKeeper):
     model = Comment
     serializer_class = CommentSerializer
 
+    def create(self, request, *args, **kwargs):
+        if self.is_part_of_the_project(request.user, kwargs["project_pk"]):
+            return super().create(request, args, kwargs)
+
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
