@@ -19,6 +19,9 @@ class Project(models.Model):
     time_created = models.DateTimeField(auto_now_add=True)
     modification_time = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ("-time_created",)
+
 
 class Contributor(models.Model):
     user = models.ForeignKey(
@@ -29,6 +32,7 @@ class Contributor(models.Model):
 
     class Meta:
         unique_together = ('user', 'project',)
+        ordering = ("-time_created",)
 
 
 class Issue(models.Model):
@@ -56,6 +60,9 @@ class Issue(models.Model):
     time_created = models.DateTimeField(auto_now_add=True)
     modification_time = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ("-time_created",)
+
 
 class Comment(models.Model):
     creator = models.ForeignKey(
@@ -64,3 +71,6 @@ class Comment(models.Model):
     content = models.TextField(max_length=2048, blank=True, verbose_name="contenu")
     time_created = models.DateTimeField(auto_now_add=True)
     modification_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-time_created",)
