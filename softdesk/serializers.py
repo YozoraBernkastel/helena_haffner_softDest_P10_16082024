@@ -24,7 +24,7 @@ class ContributorListSerializer(ModelSerializer):
 
 class ProjectSerializer(ModelSerializer):
     # def create(self, validated_data):
-    #     project = Project.objects.create(author=validated_data["creator"],
+    #     project = Project.objects.create(author=self.instance.user,
     #                                      description=validated_data["description"],
     #                                      name=validated_data["name"],
     #                                      type=validated_data["type"]    #
@@ -33,7 +33,7 @@ class ProjectSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["author"] = UserSerializer(instance.author).data
+        response["author"] = UserSerializer(instance.author.user).data
         return response
 
     class Meta:
@@ -53,7 +53,7 @@ class ProjectListSerializer(ModelSerializer):
 
 class CommentSerializer(ModelSerializer):
     def create(self, validated_data):
-        contributor = Contributor.objects.get(user=self._kwargs["pk"], project=self._kwargs["project_pk"])
+        contributor = Contributor.objects.get(user=self.instance.user, project=self._kwargs["project_pk"])
         comment = Comment.objects.create(author=contributor,
                                          related_issue=validated_data["related_issue"],
                                          content=validated_data["content"])
@@ -61,7 +61,7 @@ class CommentSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["author"] = UserSerializer(instance.author).data
+        response["author"] = UserSerializer(instance.author.user).data
         return response
 
     class Meta:
@@ -80,7 +80,7 @@ class IssueSerializer(ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
-        contributor = Contributor.objects.get(user=self._kwargs["pk"], project=self._kwargs["project_pk"])
+        contributor = Contributor.objects.get(user=self.instance.user, project=self._kwargs["project_pk"])
         issue = Issue.objects.create(author=contributor,
                                      project=self._kwargs["project_pk"],
                                      assigned_user=validated_data["assigned_user"],
@@ -98,9 +98,6 @@ class IssueSerializer(ModelSerializer):
                   "title", "description", "comments", "time_created", "modification_time"]
 
         comments = CommentSerializer(many=True, read_only=True)
-
-        def to_representation(self):
-            pass
 
 
 class IssueListSerializer(ModelSerializer):
