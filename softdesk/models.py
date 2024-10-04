@@ -1,4 +1,3 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
 from django.db import models
 
@@ -13,7 +12,7 @@ class Project(models.Model):
         BACKEND: "Back-end",
         FRONTEND: "Front-end",
         IOS: "Ios",
-        ANDROID: "androïd"
+        ANDROID: "Androïd"
     }
 
     author = models.ForeignKey(

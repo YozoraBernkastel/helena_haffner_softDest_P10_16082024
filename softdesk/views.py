@@ -117,5 +117,3 @@ class CommentCreationViewset(ModelViewSet, GateKeeper):
             return super().create(request, args, kwargs)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-# todo créer contributeur quand on crée projet et associer project.creator au contributeur plutôt qu'au user
