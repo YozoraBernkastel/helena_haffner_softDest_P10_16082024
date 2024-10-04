@@ -10,15 +10,15 @@ class UserPermission(BasePermission):
         return obj.user == request.user
 
 
-class CreatorPermission(BasePermission):
+class AuthorPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
             return True
 
-        return obj.creator == request.user
+        return obj.author == request.user
 
 
-class ProjectPermission(CreatorPermission):
+class ProjectPermission(AuthorPermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
             contributor = Contributor.objects.filter(user=request.user, project=obj).exists()
@@ -41,8 +41,8 @@ class ContributorPermission(UserPermission):
 class GateKeeper:
     @staticmethod
     def is_creator(user, project_pk) -> bool:
-        creator = Project.objects.filter(pk=project_pk, creator=user)
-        return len(creator) > 0
+        author = Project.objects.filter(pk=project_pk, author=user)
+        return len(author) > 0
 
     @staticmethod
     def is_contributor(user, project_pk) -> bool:

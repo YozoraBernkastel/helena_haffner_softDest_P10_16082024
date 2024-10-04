@@ -73,7 +73,7 @@ class CommentListSerializer(ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ["creator", "related_issue", "content"]
+        fields = ["author", "related_issue", "content"]
 
 
 class IssueSerializer(ModelSerializer):
@@ -94,7 +94,7 @@ class IssueSerializer(ModelSerializer):
 
     class Meta:
         model = Issue
-        fields = ["creator", "assigned_user", "project", "status", "type", "priority",
+        fields = ["author", "assigned_user", "project", "status", "type", "priority",
                   "title", "description", "comments", "time_created", "modification_time"]
 
         comments = CommentSerializer(many=True, read_only=True)
@@ -107,7 +107,7 @@ class IssueListSerializer(ModelSerializer):
 
     class Meta:
         model = Issue
-        fields = ["creator", "assigned_user", "project", "status", "type", "priority",
+        fields = ["author", "assigned_user", "project", "status", "type", "priority",
                   "title"]
 
         comments = CommentSerializer(many=True, read_only=True)

@@ -3,7 +3,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework import status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from softdesk.permissions import CreatorPermission, ProjectPermission, ContributorPermission, GateKeeper
+from softdesk.permissions import AuthorPermission, ProjectPermission, ContributorPermission, GateKeeper
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import (ProjectSerializer, ProjectListSerializer, ContributorSerializer,
                                   ContributorListSerializer, IssueSerializer, IssueListSerializer,
@@ -40,7 +40,7 @@ class ProjectsViewset(ModelViewSet):
 
 class IssueViewset(ModelViewSet):
     serializer_class = IssueSerializer
-    permission_classes: list = [CreatorPermission]
+    permission_classes: list = [AuthorPermission]
 
     def get_queryset(self):
         issues = None
@@ -61,7 +61,7 @@ class IssueViewset(ModelViewSet):
 
 class CommentViewset(ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes: list = [CreatorPermission]
+    permission_classes: list = [AuthorPermission]
 
     def get_queryset(self):
         issue = None
