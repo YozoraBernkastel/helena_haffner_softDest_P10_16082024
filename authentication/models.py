@@ -29,5 +29,4 @@ class User(AbstractUser, PermissionsMixin):
             self.share_personal_data = False
 
         return super().save(*args, **kwargs)
-# todo mettre en place une demande de la date de naissance lorsqu'on crée un superuser via le terminal !!!
 

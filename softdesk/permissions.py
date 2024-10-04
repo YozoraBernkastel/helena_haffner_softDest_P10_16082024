@@ -21,9 +21,9 @@ class CreatorPermission(BasePermission):
 class ProjectPermission(CreatorPermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
-            contributor = Contributor.objects.filter(user=request.user, project=obj)
+            contributor = Contributor.objects.filter(user=request.user, project=obj).exists()
 
-            return len(contributor) > 0 and super().has_object_permission(request, view, obj)
+            return contributor or super().has_object_permission(request, view, obj)
 
         return super().has_object_permission(request, view, obj)
 
@@ -50,6 +50,7 @@ class GateKeeper:
         return len(contributor) > 0
 
     def is_part_of_the_project(self, user, project_pk) -> bool:
+        # todo à supprimer lorsque tous les users seront remplacés par des contributor, on pourra alors utiliser is_contributor directement.
         return self.is_creator(user, project_pk) or self.is_contributor(user, project_pk)
 
     @staticmethod
@@ -57,4 +58,4 @@ class GateKeeper:
         return request.data["project"] == kwargs["project_pk"]
 
     def is_authorized_to_create(self, request, kwargs: dict) -> bool:
-        return self.is_same_project(request, kwargs) and self.is_part_of_the_project(request.user, kwargs["project_pk"])
+        return self.is_part_of_the_project(request.user, kwargs["project_pk"])

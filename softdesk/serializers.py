@@ -1,13 +1,15 @@
+from http.client import responses
+
 from rest_framework.serializers import ModelSerializer
+from authentication.serializers import UserSerializer
 from softdesk.models import Project, Contributor, Issue, Comment
 
 
 class ContributorSerializer(ModelSerializer):
-    def create(self, validated_data):
-        contributor = Contributor.objects.create(user=validated_data["user"],
-                                                 project=validated_data["project"]
-                                                 )
-        return contributor
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["user"] = UserSerializer(instance.user).data
+        return response
 
     class Meta:
         model = Contributor
@@ -21,14 +23,19 @@ class ContributorListSerializer(ModelSerializer):
 
 
 class ProjectSerializer(ModelSerializer):
-    def create(self, validated_data):
-        project = Project.objects.create(creator=validated_data["creator"],
-                                         description=validated_data["description"],
-                                         name=validated_data["name"],
-                                         type=validated_data["type"],
-                                         status=validated_data["status"],
-                                         )
-        return project
+    # def create(self, validated_data):
+    #     project = Project.objects.create(creator=validated_data["creator"],
+    #                                      description=validated_data["description"],
+    #                                      name=validated_data["name"],
+    #                                      type=validated_data["type"],
+    #                                      status=validated_data["status"],
+    #                                      )
+    #     return project
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["creator"] = UserSerializer(instance.creator).data
+        return response
 
     class Meta:
         model = Project
@@ -46,12 +53,16 @@ class ProjectListSerializer(ModelSerializer):
 
 
 class CommentSerializer(ModelSerializer):
-    def create(self, validated_data):
-        # todo possibilité de récupérer l'id de l'issue via l'url ??
-        comment = Comment.objects.create(creator=validated_data["creator"],
-                                         related_issue=validated_data["related_issue"],
-                                         content=validated_data["content"])
-        return comment
+    # def create(self, validated_data):
+    #     # todo possibilité de récupérer l'id de l'issue via l'url ??
+    #     comment = Comment.objects.create(creator=validated_data["creator"],
+    #                                      related_issue=validated_data["related_issue"],
+    #                                      content=validated_data["content"])
+    #     return comment
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["creator"] = UserSerializer(instance.creator).data
+        return response
 
     class Meta:
         model = Comment
@@ -66,23 +77,25 @@ class CommentListSerializer(ModelSerializer):
 
 
 class IssueSerializer(ModelSerializer):
-    def create(self, validated_data):
-        # todo possibilité de récupérer l'id de project via l'url ??
-        issue = Issue.objects.create(creator=validated_data["creator"],
-                                     project=validated_data["project"],
-                                     assigned_user=validated_data["assigned_user"],
-                                     status=validated_data["status"],
-                                     type=validated_data["type"],
-                                     priority=validated_data["priority"],
-                                     title=validated_data["title"],
-                                     description=validated_data["description"],
-                                     )
-        return issue
+    comments = CommentSerializer(many=True, read_only=True)
+
+    # def create(self, validated_data):
+    #     # todo possibilité de récupérer l'id de project via l'url ??
+    #     issue = Issue.objects.create(creator=validated_data["creator"],
+    #                                  project=validated_data["project"],
+    #                                  assigned_user=validated_data["assigned_user"],
+    #                                  status=validated_data["status"],
+    #                                  type=validated_data["type"],
+    #                                  priority=validated_data["priority"],
+    #                                  title=validated_data["title"],
+    #                                  description=validated_data["description"],
+    #                                  )
+    #     return issue
 
     class Meta:
         model = Issue
         fields = ["creator", "assigned_user", "project", "status", "type", "priority",
-                  "title", "description", "time_created", "modification_time"]
+                  "title", "description", "comments", "time_created", "modification_time"]
 
         comments = CommentSerializer(many=True, read_only=True)
 
