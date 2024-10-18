@@ -19,6 +19,7 @@ class ContributorSerializer(ModelSerializer):
 class ContributorListSerializer(ModelSerializer):
     class Meta:
         model = Contributor
+        read_only_fields = ("user", "project",)
         fields = ["user", "project"]
 
 
@@ -44,12 +45,12 @@ class ProjectListSerializer(ModelSerializer):
 
 
 class CommentSerializer(ModelSerializer):
-    def create(self, validated_data):
-        contributor = Contributor.objects.get(user=self.instance.user, project=self._kwargs["project_pk"])
-        comment = Comment.objects.create(author=contributor,
-                                         related_issue=validated_data["related_issue"],
-                                         content=validated_data["content"])
-        return comment
+    # def create(self, validated_data):
+    #     contributor = Contributor.objects.get(user=self.instance.user, project=self._kwargs["project_pk"])
+    #     comment = Comment.objects.create(author=contributor,
+    #                                      related_issue=validated_data["related_issue"],
+    #                                      content=validated_data["content"])
+    #     return comment
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -58,6 +59,7 @@ class CommentSerializer(ModelSerializer):
 
     class Meta:
         model = Comment
+        read_only_fields = ("author", "related_issue",)
         fields = ["author", "related_issue", "content", "time_created", "modification_time"]
 
 
@@ -65,27 +67,16 @@ class CommentListSerializer(ModelSerializer):
 
     class Meta:
         model = Comment
+        read_only_fields = ("author", "related_issue",)
         fields = ["author", "related_issue", "content"]
 
 
 class IssueSerializer(ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
 
-    def create(self, validated_data):
-        contributor = Contributor.objects.get(user=self.instance.user, project=self._kwargs["project_pk"])
-        issue = Issue.objects.create(author=contributor,
-                                     project=self._kwargs["project_pk"],
-                                     assigned_user=validated_data["assigned_user"],
-                                     status=validated_data["status"],
-                                     type=validated_data["type"],
-                                     priority=validated_data["priority"],
-                                     title=validated_data["title"],
-                                     description=validated_data["description"],
-                                     )
-        return issue
-
     class Meta:
         model = Issue
+        read_only_fields = ("author", "project")
         fields = ["author", "assigned_user", "project", "status", "type", "priority",
                   "title", "description", "comments", "time_created", "modification_time"]
 

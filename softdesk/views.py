@@ -1,16 +1,15 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import CreateAPIView
 from rest_framework import status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from softdesk.permissions import AuthorPermission, ProjectPermission, ContributorPermission, GateKeeper
+from softdesk.permissions import ProjectPermission, ContributorPermission, InsideProjectPermission, GateKeeper
 from softdesk.models import Project, Contributor, Issue, Comment
 from softdesk.serializers import (ProjectSerializer, ProjectListSerializer, ContributorSerializer,
                                   ContributorListSerializer, IssueSerializer, IssueListSerializer,
                                   CommentSerializer, CommentListSerializer)
 
 
-class ContributorViewset(ModelViewSet):
+class ContributorViewset(ModelViewSet, GateKeeper):
     serializer_class = ContributorSerializer
     permission_classes: list = [ContributorPermission]
 
@@ -24,6 +23,18 @@ class ContributorViewset(ModelViewSet):
             self.serializer_class = ContributorListSerializer
 
         return super().get_serializer_class()
+
+    # todo utile ??? Quelles sont les règles pour créer un contributeur ?
+    # def create(self, request, *args, **kwargs):
+    #     if self.is_authorized_to_create(request, kwargs):
+    #         return super().create(request, args, kwargs)
+    #
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def perform_create(self, serializer):
+        project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        serializer.save(user=self.request.user, project=project)
+
 
 
 class ProjectsViewset(ModelViewSet):
@@ -44,13 +55,14 @@ class ProjectsViewset(ModelViewSet):
         contributor.save()
 
 
-class IssueViewset(ModelViewSet):
+class IssueViewset(ModelViewSet, GateKeeper):
     serializer_class = IssueSerializer
-    permission_classes: list = [AuthorPermission]
+    permission_classes: list = [InsideProjectPermission]
 
     def get_queryset(self):
         issues = None
-        project = self.kwargs["project_pk"]
+        project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        print("get queryset")
         user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
 
         if project is not None and user_as_contributor is not None:
@@ -59,15 +71,26 @@ class IssueViewset(ModelViewSet):
         return issues
 
     def get_serializer_class(self):
-        if "pk" not in self.kwargs:
+        if self.action == "list":
             self.serializer_class = IssueListSerializer
 
         return super().get_serializer_class()
 
+    def create(self, request, *args, **kwargs):
+        if self.is_author(request.user, kwargs["project_pk"]):
+            return super().create(request, args, kwargs)
 
-class CommentViewset(ModelViewSet):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def perform_create(self, serializer):
+        project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        contributor = get_object_or_404(Contributor, user=self.request.user, project=project)
+        serializer.save(author=contributor, project=project)
+
+
+class CommentViewset(ModelViewSet, GateKeeper):
     serializer_class = CommentSerializer
-    permission_classes: list = [AuthorPermission]
+    permission_classes: list = [InsideProjectPermission]
 
     def get_queryset(self):
         issue = None
@@ -85,36 +108,14 @@ class CommentViewset(ModelViewSet):
 
         return super().get_serializer_class()
 
-
-# Creation views
-class ContributorCreationViewset(ModelViewSet, GateKeeper):
-    model = Contributor
-    serializer_class = ContributorSerializer
-
     def create(self, request, *args, **kwargs):
-        if self.is_authorized_to_create(request, kwargs):
+        if self.is_contributor(request.user, kwargs["project_pk"]):
             return super().create(request, args, kwargs)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-
-class IssueCreationVieweset(ModelViewSet, GateKeeper):
-    model = Issue
-    serializer_class = IssueSerializer
-
-    def create(self, request, *args, **kwargs):
-        if self.is_authorized_to_create(request, kwargs):
-            return super().create(request, args, kwargs)
-
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-class CommentCreationViewset(ModelViewSet, GateKeeper):
-    model = Comment
-    serializer_class = CommentSerializer
-
-    def create(self, request, *args, **kwargs):
-        if self.is_part_of_the_project(request.user, kwargs["project_pk"]):
-            return super().create(request, args, kwargs)
-
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    def perform_create(self, serializer):
+        project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        contributor = get_object_or_404(Contributor, user=self.request.user, project=project)
+        issue = get_object_or_404(Issue, pk=self.kwargs["issue_pk"])
+        serializer.save(author=contributor, related_issue=issue)
