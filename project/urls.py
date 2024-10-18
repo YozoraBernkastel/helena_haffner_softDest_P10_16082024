@@ -14,13 +14,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from unicodedata import lookup
 
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_nested import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from softdesk.views import (ProjectsViewset, ProjectCreationViewset,  ContributorViewset, ContributorCreationViewset,
+from softdesk.views import (ProjectsViewset, ContributorViewset, ContributorCreationViewset,
                             IssueViewset, IssueCreationVieweset, CommentViewset, CommentCreationViewset)
 
 router = routers.SimpleRouter()
@@ -44,5 +43,4 @@ urlpatterns = [
     path("softdesk/api/", include(router.urls)),
     path("softdesk/api/", include(project_router.urls)),
     path("softdesk/api/", include(issue_router.urls)),
-    path("softdesk/api/create/project/", ProjectCreationViewset.as_view(), name="project_creation"),
 ]

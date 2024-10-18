@@ -136,7 +136,6 @@ AUTH_USER_MODEL = "authentication.User"
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/public/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Media files
 MEDIA_URL = '/public/media/'

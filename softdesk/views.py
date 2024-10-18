@@ -32,10 +32,16 @@ class ProjectsViewset(ModelViewSet):
     permission_classes: list = [ProjectPermission]
 
     def get_serializer_class(self):
-        if "pk" not in self.kwargs:
+        if self.action == "list":
             self.serializer_class = ProjectListSerializer
 
         return super().get_serializer_class()
+
+    def perform_create(self, serializer):
+        contributor = Contributor.objects.create(user=self.request.user, project=None)
+        project = serializer.save(author=contributor)
+        contributor.project = project
+        contributor.save()
 
 
 class IssueViewset(ModelViewSet):
@@ -81,11 +87,6 @@ class CommentViewset(ModelViewSet):
 
 
 # Creation views
-class ProjectCreationViewset(CreateAPIView):
-    model = Project
-    serializer_class = ProjectSerializer
-
-
 class ContributorCreationViewset(ModelViewSet, GateKeeper):
     model = Contributor
     serializer_class = ContributorSerializer

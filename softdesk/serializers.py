@@ -23,14 +23,6 @@ class ContributorListSerializer(ModelSerializer):
 
 
 class ProjectSerializer(ModelSerializer):
-    # def create(self, validated_data):
-    #     project = Project.objects.create(author=self.instance.user,
-    #                                      description=validated_data["description"],
-    #                                      name=validated_data["name"],
-    #                                      type=validated_data["type"]    #
-    #                                      )
-    #     return project
-
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response["author"] = UserSerializer(instance.author.user).data
@@ -38,17 +30,17 @@ class ProjectSerializer(ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["author", "description", "name", "type", "status", "time_created", "modification_time",
+        fields = [ "description", "name", "type", "time_created", "modification_time",
                   "contributors"]
 
     contributors = ContributorSerializer(many=True, read_only=True)
 
 
 class ProjectListSerializer(ModelSerializer):
-
     class Meta:
         model = Project
-        fields = ["author", "description", "name", "type", "status"]
+        read_only_fields= ("author",)
+        fields = ["author", "description", "name", "type"]
 
 
 class CommentSerializer(ModelSerializer):
