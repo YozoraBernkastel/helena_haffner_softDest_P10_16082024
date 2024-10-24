@@ -39,10 +39,21 @@ class ContributorViewset(ModelViewSet, GateKeeper):
 
 
 
-class ProjectsViewset(ModelViewSet):
+class ProjectsViewset(ModelViewSet, GateKeeper):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes: list = [ProjectPermission]
+
+    @staticmethod
+    def is_new_author_contributor(data, project_pk) -> bool:
+        return not "author" in data or Contributor.objects.filter(pk=data["author"], project=project_pk).exists()
+
+    def partial_update(self, request, *args, **kwargs):
+        if self.is_new_author_contributor(request.data, kwargs["pk"]):
+            return super().partial_update(request, args, kwargs)
+
+        print("go to 404")
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get_serializer_class(self):
         if self.action == "list":

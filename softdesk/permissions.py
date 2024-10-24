@@ -37,6 +37,8 @@ class ContributorPermission(UserPermission):
 
 
     def has_object_permission(self, request, view, obj):
+        if request.method == "DELETE":
+            return request.user == obj.user and request.user != obj.project.author.user
 
         return  Contributor.objects.filter(user=request.user, project=obj.project).exists()
 
