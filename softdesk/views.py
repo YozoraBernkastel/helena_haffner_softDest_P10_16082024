@@ -24,6 +24,8 @@ class ContributorViewset(ModelViewSet, GateKeeper):
 
         return super().get_serializer_class()
 
+    # Si l'utilisateur souhaite supprimer son contributor, ne devrait avoir à aller
+
     # todo utile ??? Quelles sont les règles pour créer un contributeur ?
     # def create(self, request, *args, **kwargs):
     #     if self.is_authorized_to_create(request, kwargs):
@@ -62,7 +64,6 @@ class IssueViewset(ModelViewSet, GateKeeper):
     def get_queryset(self):
         issues = None
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
-        print("get queryset")
         user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
 
         if project is not None and user_as_contributor is not None:
@@ -77,7 +78,7 @@ class IssueViewset(ModelViewSet, GateKeeper):
         return super().get_serializer_class()
 
     def create(self, request, *args, **kwargs):
-        if self.is_author(request.user, kwargs["project_pk"]):
+        if self.is_contributor(request.user, kwargs["project_pk"]):
             return super().create(request, args, kwargs)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
