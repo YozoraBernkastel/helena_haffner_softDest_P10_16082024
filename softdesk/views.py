@@ -24,6 +24,8 @@ class ContributorViewset(ModelViewSet, GateKeeper):
 
         return super().get_serializer_class()
 
+    # Si l'utilisateur souhaite supprimer son contributor, ne devrait avoir à aller
+
     # todo utile ??? Quelles sont les règles pour créer un contributeur ?
     # def create(self, request, *args, **kwargs):
     #     if self.is_authorized_to_create(request, kwargs):
@@ -37,10 +39,20 @@ class ContributorViewset(ModelViewSet, GateKeeper):
 
 
 
-class ProjectsViewset(ModelViewSet):
+class ProjectsViewset(ModelViewSet, GateKeeper):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes: list = [ProjectPermission]
+
+    @staticmethod
+    def is_new_author_contributor(data, project_pk) -> bool:
+        return not "author" in data or Contributor.objects.filter(pk=data["author"], project=project_pk).exists()
+
+    def partial_update(self, request, *args, **kwargs):
+        if self.is_new_author_contributor(request.data, kwargs["pk"]):
+            return super().partial_update(request, args, kwargs)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -62,7 +74,6 @@ class IssueViewset(ModelViewSet, GateKeeper):
     def get_queryset(self):
         issues = None
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
-        print("get queryset")
         user_as_contributor = Contributor.objects.filter(user=self.request.user, project=project)
 
         if project is not None and user_as_contributor is not None:
@@ -77,7 +88,7 @@ class IssueViewset(ModelViewSet, GateKeeper):
         return super().get_serializer_class()
 
     def create(self, request, *args, **kwargs):
-        if self.is_author(request.user, kwargs["project_pk"]):
+        if self.is_contributor(request.user, kwargs["project_pk"]):
             return super().create(request, args, kwargs)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
