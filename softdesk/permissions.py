@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404
+from django.template.context_processors import request
 from rest_framework.permissions import BasePermission
 from softdesk.models import Contributor, Project
 
@@ -10,52 +12,53 @@ class UserPermission(BasePermission):
         return obj.user == request.user
 
 
-class CreatorPermission(BasePermission):
+class AuthorPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
             return True
 
-        return obj.creator == request.user
+        return obj.author == request.user
 
 
-class ProjectPermission(CreatorPermission):
+class ProjectPermission(AuthorPermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
-            contributor = Contributor.objects.filter(user=request.user, project=obj).exists()
-
-            return contributor or super().has_object_permission(request, view, obj)
+            return Contributor.objects.filter(user=request.user, project=obj).exists()
 
         return super().has_object_permission(request, view, obj)
 
 
 class ContributorPermission(UserPermission):
+
+    def has_permission(self, request, view):
+        if request.method == "GET":
+            return Contributor.objects.filter(user=request.user, project=view.kwargs["project_pk"]).exists()
+        return super().has_permission(request, view)
+
+
+    def has_object_permission(self, request, view, obj):
+
+        return  Contributor.objects.filter(user=request.user, project=obj.project).exists()
+
+class InsideProjectPermission(BasePermission):
+
+    def has_permission(self, request, view):
+
+        return Contributor.objects.filter(user=request.user, project=view.kwargs["project_pk"]).exists()
+
+
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
-            contributor = Contributor.objects.filter(user=request.user, project=obj.project)
-
-            return len(contributor) > 0 and super().has_object_permission(request, view, obj)
+            return  Contributor.objects.filter(user=request.user, project=obj.project).exists()
 
         return super().has_object_permission(request, view, obj)
 
-
 class GateKeeper:
     @staticmethod
-    def is_creator(user, project_pk) -> bool:
-        creator = Project.objects.filter(pk=project_pk, creator=user)
-        return len(creator) > 0
-
-    @staticmethod
     def is_contributor(user, project_pk) -> bool:
-        contributor = Contributor.objects.filter(user=user, project=project_pk)
-        return len(contributor) > 0
-
-    def is_part_of_the_project(self, user, project_pk) -> bool:
-        # todo à supprimer lorsque tous les users seront remplacés par des contributor, on pourra alors utiliser is_contributor directement.
-        return self.is_creator(user, project_pk) or self.is_contributor(user, project_pk)
+        return get_object_or_404(Contributor, user=user, project=project_pk)
 
     @staticmethod
-    def is_same_project(request, kwargs: dict) -> bool:
-        return request.data["project"] == kwargs["project_pk"]
-
-    def is_authorized_to_create(self, request, kwargs: dict) -> bool:
-        return self.is_part_of_the_project(request.user, kwargs["project_pk"])
+    def is_author(user, project_pk) -> bool:
+        contributor = Contributor.objects.filter(user=user, project=project_pk)
+        return contributor.exists() and Project.objects.filter(pk=project_pk, author=contributor[0]).exists()
