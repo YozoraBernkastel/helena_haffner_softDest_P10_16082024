@@ -52,7 +52,6 @@ class ProjectsViewset(ModelViewSet, GateKeeper):
         if self.is_new_author_contributor(request.data, kwargs["pk"]):
             return super().partial_update(request, args, kwargs)
 
-        print("go to 404")
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get_serializer_class(self):
