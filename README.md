@@ -2,9 +2,11 @@
 
 ## Description du programme
 
-[//]: # ( todo décrire à quoi sert le programme )
-Pour lancer le programme, allez dans le dossier du projet puis, dans un terminal, utilisez la commande poetry run python3 main.py.
-Pour l'heure, aucune interface ne permet de donner directement au script une URL, il faudra donc aller sur la page main.py et changer l'url des variables ou en l'ajoutant directement comme argument de la fonction scrap_datas(argument).
+Ce projet est une API Django permettant de consulter, créer, modifier et supprimer des projets.
+Chaque projet peut contenir plusieurs tâches, elles-mêmes pouvant être parentes de commentaires.
+Un utilisateur doit s'indentifier et faire partie d'un projet afin de pouvoir consulter les informations relatives à ce dernier et intéragir avec.
+Le système d'authentification utilise les Json Web Token.
+Un utilisateur ne participant à aucun projet n'aura accès qu'à la liste de ceux-ci et devra s'inscrire à celui qui l'intéresse pour en consulter le contenu.
 
 L'environnement virtuel utilisé pour ce projet est Poetry.
 
@@ -18,7 +20,7 @@ Installation:
 curl -sSL https://install.python-poetry.org | python3 - 
 ```
 
-Activer l'environnement virtuel : 
+Activer l'environnement virtuel :
 ```shell
 poetry shell
 ```
@@ -26,23 +28,37 @@ Installer les dépendances (les fichiers pyproject.toml ou poetry.lock doivent �
 ```shell
 poetry install 
 ```
-Sortir de l'environnement virtuel : 
+Sortir de l'environnement virtuel :
 ```shell
 exit
 ```
 
-## Lancer le programme depuis l'environnement virtuel
-Dans le terminal, à la racine du projet :
+## Mettre en place la base de données
+Une fois l'environnement virtuel lancé, utilisez dans le terminal la commande:
 ```shell
-python3 main.py
+python manage.py migrate
 ```
 
-## Lancer le programme sans l'environnement virtuel
-Dans le terminal, à la racine du projet :
-```shell
-poetry run python3 main.py
+## Créer un compte administrateur
+Toujours depuis le terminal, utilisez la commande:
+```
+python manage.py createsuperuser
 ```
 
+## Lancer le serveur en local
+
+Toujours dans l'environnement virtuel, et une fois la base de données configurée, dans le terminal, entrez la commande:
+```shell
+python manage.py runserver
+```
+
+## Accéder à l'administration
+
+Une fois le serveur lancé en local, vous pouvez vous consulter l'administration du projet depuis le navigateur en allant à l'adresse suivante:
+(http://localhost:8000/admin/)
 
 
+## Où trouver les endpoints ?
+
+Les endpoints sont disponibles sous forme de fichier json dans le dossier "postman_json" qui devrait permettre de tout installer sur Postman.
 
