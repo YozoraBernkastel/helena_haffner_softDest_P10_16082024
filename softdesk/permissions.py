@@ -34,7 +34,6 @@ class ContributorPermission(UserPermission):
             return Contributor.objects.filter(user=request.user, project=view.kwargs["project_pk"]).exists()
         return super().has_permission(request, view)
 
-
     def has_object_permission(self, request, view, obj):
         if request.method == "DELETE":
             return request.user == obj.user and request.user != obj.project.author.user
@@ -57,3 +56,9 @@ class GateKeeper:
     @staticmethod
     def is_contributor(user, project_pk) -> bool:
         return get_object_or_404(Contributor, user=user, project=project_pk)
+
+    @staticmethod
+    def same_project(kwargs: dict) -> bool:
+        issue: Issue = get_object_or_404(Issue, pk=kwargs["issue_pk"])
+        return int(kwargs["project_pk"]) == issue.project.pk
+
