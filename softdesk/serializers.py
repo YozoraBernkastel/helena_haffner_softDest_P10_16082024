@@ -27,6 +27,10 @@ class DataRepresentation:
     def count_comments(issue: Issue):
         return len(Comment.objects.filter(related_issue=issue))
 
+    @staticmethod
+    def count_issues(project: Project):
+        return len(Issue.objects.filter(project=project))
+
 
 
 class ContributorSerializer(ModelSerializer, DataRepresentation):
@@ -56,10 +60,12 @@ class ProjectSerializer(ModelSerializer, DataRepresentation):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response["author"] = self.detail_contributor_info(instance.author)
+        response["issues_number"] = self.count_issues(instance)
         return response
 
     class Meta:
         model = Project
+        read_only_fields = ("author",)
         fields = ["name", "author", "description", "type", "time_created", "modification_time",
                   "contributors"]
 
@@ -69,6 +75,7 @@ class ProjectSerializer(ModelSerializer, DataRepresentation):
 class ProjectListSerializer(ModelSerializer, DataRepresentation):
     def to_representation(self, instance):
         response = super().to_representation(instance)
+        response["project_pk"] = instance.pk
         response["author"] = self.contributor_info(instance.author)
         return response
 

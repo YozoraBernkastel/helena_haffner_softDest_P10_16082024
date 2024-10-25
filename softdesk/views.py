@@ -42,7 +42,7 @@ class ProjectsViewset(ModelViewSet, GateKeeper):
         if self.is_new_author_contributor(request.data, kwargs["pk"]):
             return super().partial_update(request, args, kwargs)
 
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(data={"detail": "Requête non autorisée"}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -81,7 +81,7 @@ class IssueViewset(ModelViewSet, GateKeeper):
         if self.is_contributor(request.user, kwargs["project_pk"]):
             return super().create(request, args, kwargs)
 
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(data={"detail": "Requête non autorisée"}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
@@ -110,10 +110,10 @@ class CommentViewset(ModelViewSet, GateKeeper):
         return super().get_serializer_class()
 
     def create(self, request, *args, **kwargs):
-        if self.is_contributor(request.user, kwargs["project_pk"]):
+        if self.is_contributor(request.user, kwargs["project_pk"]) and self.same_project(kwargs):
             return super().create(request, args, kwargs)
 
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(data={"detail": "Requête non autorisée"}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_create(self, serializer):
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])

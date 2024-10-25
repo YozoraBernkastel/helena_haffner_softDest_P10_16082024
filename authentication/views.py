@@ -23,9 +23,9 @@ class DeleteViewSet(ModelViewSet):
     def get_object(self):
         return self.request.user
 
-
     def delete(self, request, *args, **kwargs):
         if self.is_user_author_of_projects():
-            return Response(data={"error": "Impossible de supprimer car auteur de projet."},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"error": "Impossible de supprimer car auteur de projet."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         return self.destroy(request, *args, **kwargs)
