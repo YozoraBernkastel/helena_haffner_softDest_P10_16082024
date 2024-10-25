@@ -1,21 +1,32 @@
 from rest_framework.serializers import ModelSerializer
-from authentication.models import User
 from authentication.serializers import UserSerializer
 from softdesk.models import Project, Contributor, Issue, Comment
 
 
 class DataRepresentation:
     @staticmethod
-    def user_info(user: User) -> dict:
-        return {"pk": user.pk, "username": user.username}
+    def contributor_info(instance) -> dict:
+        return {"contributor_pk": instance.pk,
+                "user_pk": instance.user.pk,
+                "username": instance.user.username} \
+            if instance.user else {"user_pk": "no user", "username": "no username"}
 
     @staticmethod
-    def detail_user_info(user: User) -> dict:
-        return {"pk": user.pk, "user": UserSerializer(user).data}
+    def detail_contributor_info(instance) -> dict:
+        return {"contributor_pk": instance.pk,
+                "user_pk": instance.user.pk,
+                "user_data": UserSerializer(instance.user).data} \
+            if instance.user else {"user_pk": "no user", "user": "no user"}
 
     @staticmethod
-    def issue_info(issue: Issue) -> dict:
-        return {"pk": issue.pk, "title": issue.title}
+    def detail_user_info(user) -> dict:
+        return {"user_pk": user.pk, "user_data": UserSerializer(user).data} if user \
+            else {"user_pk": "no user", "user": "no user"}
+
+    @staticmethod
+    def count_comments(issue: Issue):
+        return len(Comment.objects.filter(related_issue=issue))
+
 
 
 class ContributorSerializer(ModelSerializer, DataRepresentation):
@@ -32,7 +43,7 @@ class ContributorSerializer(ModelSerializer, DataRepresentation):
 class ContributorListSerializer(ModelSerializer, DataRepresentation):
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["user"] = self.user_info( instance.user)
+        response["user"] = self.contributor_info(instance)
         return response
 
     class Meta:
@@ -44,12 +55,12 @@ class ContributorListSerializer(ModelSerializer, DataRepresentation):
 class ProjectSerializer(ModelSerializer, DataRepresentation):
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["author"] = self.detail_user_info(instance.author.user)
+        response["author"] = self.detail_contributor_info(instance.author)
         return response
 
     class Meta:
         model = Project
-        fields = [ "name", "author", "description", "type", "time_created", "modification_time",
+        fields = ["name", "author", "description", "type", "time_created", "modification_time",
                   "contributors"]
 
     contributors = ContributorListSerializer(many=True, read_only=True)
@@ -58,19 +69,19 @@ class ProjectSerializer(ModelSerializer, DataRepresentation):
 class ProjectListSerializer(ModelSerializer, DataRepresentation):
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["author"] = self.user_info(instance.author.user)
+        response["author"] = self.contributor_info(instance.author)
         return response
 
     class Meta:
         model = Project
-        read_only_fields= ("author",)
+        read_only_fields = ("author",)
         fields = ["name", "author", "description", "type"]
 
 
 class CommentSerializer(ModelSerializer, DataRepresentation):
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["author"] = self.detail_user_info(instance.author.user)
+        response["author"] = self.detail_contributor_info(instance.author)
         return response
 
     class Meta:
@@ -83,13 +94,13 @@ class CommentListSerializer(ModelSerializer, DataRepresentation):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["author"] = self.user_info(instance.author.user)
-        response["related_issue"] = self.issue_info(instance.related_issue)
+        response["author"] = self.contributor_info(instance.author)
+        response["comment_pk"] = instance.pk
         return response
 
     class Meta:
         model = Comment
-        read_only_fields = ("author", "related_issue",)
+        read_only_fields = ("author",)
         fields = ["author", "content"]
 
 
@@ -98,8 +109,8 @@ class IssueSerializer(ModelSerializer, DataRepresentation):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["author"] = self.detail_user_info(instance.author.user)
-        response["assigned_user"] = self.detail_user_info(instance.assigned_user.user)
+        response["author"] = self.detail_contributor_info(instance.author)
+        response["assigned_user"] = self.detail_contributor_info(instance.assigned_user)
         return response
 
     class Meta:
@@ -115,10 +126,11 @@ class IssueListSerializer(ModelSerializer, DataRepresentation):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response["author"] = self.user_info(instance.author.user)
-        response["assigned_user"] = self.user_info(instance.assigned_user.user)
+        response["issue_pk"] = instance.pk
+        response["author"] = self.contributor_info(instance.author)
+        response["assigned_user"] = self.contributor_info(instance.assigned_user)
+        response["comments_number"] = self.count_comments(instance)
         return response
-
 
     class Meta:
         model = Issue

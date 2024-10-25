@@ -29,4 +29,3 @@ class User(AbstractUser, PermissionsMixin):
             self.share_personal_data = False
 
         return super().save(*args, **kwargs)
-

@@ -1,9 +1,11 @@
 from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from authentication.models import User
-from django.contrib.auth.hashers import make_password
 
 
 class CreateUserSerializer(ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     def create(self, validated_data):
         contributor = User.objects.create_user(username=validated_data["username"],
                                                password=validated_data["password"],
