@@ -1,0 +1,892 @@
+{
+	"info": {
+		"_postman_id": "aa6df2f6-52f2-47e2-bcf7-2931d9b13bfe",
+		"name": "softDesk",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38951632"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "connexion",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var res = pm.response.json();",
+									"pm.environment.set('authToken', res.access);",
+									"pm.environment.set('REFRESH_TOKEN', res.refresh);",
+									"console.log(res.access)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "Sunako",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "shiki2345",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/token/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"token",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "connexion 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var res = pm.response.json();",
+									"pm.environment.set('authToken', res.access);",
+									"pm.environment.set('REFRESH_TOKEN', res.refresh);",
+									"console.log(res.access)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "shikabane",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "shi12345",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/token/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"token",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "connexion admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var res = pm.response.json();",
+									"pm.environment.set('authToken', res.access);",
+									"pm.environment.set('REFRESH_TOKEN', res.refresh);",
+									"console.log(res.access)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/token/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"token",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "token_refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var res = pm.response.json();",
+									"pm.environment.set('authToken', res.access);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "refresh",
+									"value": "{{REFRESH_TOKEN}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/token/refresh/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"token",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "Sunako",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "shiki12345",
+									"type": "text"
+								},
+								{
+									"key": "birthday_date",
+									"value": "2015-12-12",
+									"type": "text"
+								},
+								{
+									"key": "can_contact",
+									"value": "True",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}api/auth/signup/",
+							"host": [
+								"{{LOCALHOST}}api"
+							],
+							"path": [
+								"auth",
+								"signup",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}api/auth/delete/0/",
+							"host": [
+								"{{LOCALHOST}}api"
+							],
+							"path": [
+								"auth",
+								"delete",
+								"0",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Project",
+			"item": [
+				{
+					"name": "project",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/11",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_project",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "author",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "projet voué à disparaitre",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "Back-end",
+									"type": "text"
+								},
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_project",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "other name ",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/3/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"3",
+								""
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "\"new name\"",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_project",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/11/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"11",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Contributor",
+			"item": [
+				{
+					"name": "contributor",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/3/contributor/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"3",
+								"contributor",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_contributor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/9/contributor/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"9",
+								"contributor",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_contributor",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/9/contributor/26/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"9",
+								"contributor",
+								"26",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_contributor",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/9/contributor/25/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"9",
+								"contributor",
+								"25",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Issue",
+			"item": [
+				{
+					"name": "issue",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/6/issue/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"6",
+								"issue",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_issue",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "assigned_user",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "ToDo",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "Feature",
+									"type": "text"
+								},
+								{
+									"key": "priority",
+									"value": "Medium",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "I have some issues",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "I guess",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/6/issue/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"6",
+								"issue",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_issue",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "description",
+									"value": "I'm pretty sure !!",
+									"type": "text"
+								},
+								{
+									"key": "assigned_user",
+									"value": "20",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/6/issue/5/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"6",
+								"issue",
+								"5",
+								""
+							],
+							"query": [
+								{
+									"key": "description",
+									"value": "I'm pretty sure",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_issue",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/6/issue/7/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"6",
+								"issue",
+								"7",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comment",
+			"item": [
+				{
+					"name": "comment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/3/issue/5/comment/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"3",
+								"issue",
+								"5",
+								"comment",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_comment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "content",
+									"value": "un commentaire peu pertinent",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/3/issue/1/comment/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"3",
+								"issue",
+								"1",
+								"comment",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_comment",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "content",
+									"value": "contenu modifié !!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/6/issue/5/comment/2/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"6",
+								"issue",
+								"5",
+								"comment",
+								"2",
+								""
+							],
+							"query": [
+								{
+									"key": "content",
+									"value": "contenu modifié",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{LOCALHOST}}softdesk/api/project/6/issue/5/comment/2/",
+							"host": [
+								"{{LOCALHOST}}softdesk"
+							],
+							"path": [
+								"api",
+								"project",
+								"6",
+								"issue",
+								"5",
+								"comment",
+								"2",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "LOCALHOST",
+			"value": " http://127.0.0.1:8000/",
+			"type": "string"
+		},
+		{
+			"key": "TOKEN",
+			"value": "None",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "REFRESH_TOKEN",
+			"value": "None",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}
