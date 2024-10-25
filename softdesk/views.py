@@ -101,7 +101,7 @@ class CommentViewset(ModelViewSet, GateKeeper):
         if project is not None and user_as_contributor is not None:
             issue = get_object_or_404(Issue, pk=self.kwargs["issue_pk"])
 
-        return issue.comments.all()
+        return issue.comments.all() if project == issue.project else []
 
     def get_serializer_class(self):
         if "pk" not in self.kwargs:
