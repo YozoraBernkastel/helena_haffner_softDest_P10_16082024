@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from softdesk.permissions import ProjectPermission, ContributorPermission, InsideProjectPermission, GateKeeper
-from softdesk.models import Project, Contributor, Issue, Comment
+from softdesk.models import Project, Contributor, Issue
 from softdesk.serializers import (ProjectSerializer, ProjectListSerializer, ContributorSerializer,
                                   ContributorListSerializer, IssueSerializer, IssueListSerializer,
                                   CommentSerializer, CommentListSerializer)
