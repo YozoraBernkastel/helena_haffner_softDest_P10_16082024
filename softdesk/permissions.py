@@ -38,7 +38,7 @@ class ContributorPermission(UserPermission):
         if request.method == "DELETE":
             return request.user == obj.user and request.user != obj.project.author.user
 
-        return  Contributor.objects.filter(user=request.user, project=obj.project).exists()
+        return Contributor.objects.filter(user=request.user, project=obj.project).exists()
 
 class InsideProjectPermission(BasePermission):
 
@@ -48,7 +48,7 @@ class InsideProjectPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == "GET":
             project = obj.project if isinstance(obj, Issue) else obj.related_issue.project
-            return  Contributor.objects.filter(user=request.user, project=project).exists()
+            return Contributor.objects.filter(user=request.user, project=project).exists()
 
         return request.user == obj.author.user
 
