@@ -5,6 +5,7 @@ from authentication.models import User
 
 class CreateUserSerializer(ModelSerializer):
     password = serializers.CharField(write_only=True)
+
     # birthday_date = serializers.DateField(write_only=True)
     # can_contact = serializers.BooleanField(write_only=True)
     # share_personal_data = serializers.BooleanField(write_only=True)
